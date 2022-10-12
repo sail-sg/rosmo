@@ -1,0 +1,42 @@
+name: CI checks
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/check.yml'
+      - 'experiment/**'
+      - 'rosmo/**'
+      - 'tests/**'
+      - 'pyproject.py'
+      - 'Makefile'
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/check.yml'
+      - 'experiment/**'
+      - 'rosmo/**'
+      - 'tests/**'
+      - 'pyproject.py'
+      - 'Makefile'
+
+concurrency:
+  group: ${{ github.ref }}-${{ github.workflow }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v4
+        with:
+          python-version: 3.8.13
+      - uses: ./.github/actions/cache
+      - name: Install
+        run: pip install -e .
+      - name: Lint
+        run: make checks
