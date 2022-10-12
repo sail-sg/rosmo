@@ -1,0 +1,416 @@
+{
+  "alien": {
+    "BC": 2670.0,
+    "BCQ": 2090.0,
+    "DQN": 1690.0,
+    "IQN": 2860.0,
+    "REM": 1730.0,
+    "online_dqn": 2766.81,
+    "random": 199.8
+  },
+  "amidar": {
+    "BC": 256.0,
+    "BCQ": 254.0,
+    "DQN": 224.0,
+    "IQN": 351.0,
+    "REM": 214.0,
+    "online_dqn": 1556.96,
+    "random": 3.19
+  },
+  "assault": {
+    "BC": 1810.0,
+    "BCQ": 2260.0,
+    "DQN": 1940.0,
+    "IQN": 2180.0,
+    "REM": 3070.0,
+    "online_dqn": 1946.1,
+    "random": 235.15
+  },
+  "asterix": {
+    "BC": 2960.0,
+    "BCQ": 1930.0,
+    "DQN": 1520.0,
+    "IQN": 5710.0,
+    "REM": 4890.0,
+    "online_dqn": 4131.77,
+    "random": 279.06
+  },
+  "atlantis": {
+    "BC": 2390000.0,
+    "BCQ": 3200000.0,
+    "DQN": 3020000.0,
+    "IQN": 2710000.0,
+    "REM": 3360000.0,
+    "online_dqn": 944228.0,
+    "random": 16973.04
+  },
+  "bank_heist": {
+    "BC": 1050.0,
+    "BCQ": 270.0,
+    "DQN": 50.0,
+    "IQN": 1110.0,
+    "REM": 160.0,
+    "online_dqn": 907.72,
+    "random": 13.65
+  },
+  "battle_zone": {
+    "BC": 4800.0,
+    "BCQ": 25400.0,
+    "DQN": 25600.0,
+    "IQN": 16500.0,
+    "REM": 26200.0,
+    "online_dqn": 26458.99,
+    "random": 2786.8
+  },
+  "beam_rider": {
+    "BC": 1480.0,
+    "BCQ": 1990.0,
+    "DQN": 1810.0,
+    "IQN": 3020.0,
+    "REM": 2200.0,
+    "online_dqn": 6453.26,
+    "random": 362.05
+  },
+  "boxing": {
+    "BC": 83.9,
+    "BCQ": 97.2,
+    "DQN": 96.3,
+    "IQN": 95.8,
+    "REM": 97.3,
+    "online_dqn": 84.11,
+    "random": 0.79
+  },
+  "breakout": {
+    "BC": 235.0,
+    "BCQ": 375.0,
+    "DQN": 324.0,
+    "IQN": 314.0,
+    "REM": 362.0,
+    "online_dqn": 157.86,
+    "random": 1.33
+  },
+  "carnival": {
+    "BC": 3920.0,
+    "BCQ": 4310.0,
+    "DQN": 1450.0,
+    "IQN": 4820.0,
+    "REM": 2080.0,
+    "online_dqn": 5339.46,
+    "random": 669.55
+  },
+  "centipede": {
+    "BC": 1070.0,
+    "BCQ": 1430.0,
+    "DQN": 1250.0,
+    "IQN": 1830.0,
+    "REM": 810.0,
+    "online_dqn": 3972.49,
+    "random": 2181.66
+  },
+  "chopper_command": {
+    "BC": 660.0,
+    "BCQ": 3950.0,
+    "DQN": 2250.0,
+    "IQN": 830.0,
+    "REM": 3610.0,
+    "online_dqn": 3678.15,
+    "random": 823.14
+  },
+  "crazy_climber": {
+    "BC": 123000.0,
+    "BCQ": 28000.0,
+    "DQN": 23000.0,
+    "IQN": 126000.0,
+    "REM": 42000.0,
+    "online_dqn": 118080.24,
+    "random": 8173.59
+  },
+  "demon_attack": {
+    "BC": 7600.0,
+    "BCQ": 19300.0,
+    "DQN": 11000.0,
+    "IQN": 15500.0,
+    "REM": 17000.0,
+    "online_dqn": 6517.02,
+    "random": 166.02
+  },
+  "double_dunk": {
+    "BC": -16.4,
+    "BCQ": -12.9,
+    "DQN": -17.9,
+    "IQN": -16.7,
+    "REM": -17.9,
+    "online_dqn": -1.22,
+    "random": -18.42
+  },
+  "enduro": {
+    "BC": 720.0,
+    "BCQ": 1390.0,
+    "DQN": 1210.0,
+    "IQN": 1700.0,
+    "REM": 3650.0,
+    "online_dqn": 1016.28,
+    "random": 0.0
+  },
+  "fishing_derby": {
+    "BC": -7.4,
+    "BCQ": 28.9,
+    "DQN": 17.0,
+    "IQN": 20.8,
+    "REM": 29.3,
+    "online_dqn": 18.57,
+    "random": -93.25
+  },
+  "freeway": {
+    "BC": 21.8,
+    "BCQ": 16.9,
+    "DQN": 15.4,
+    "IQN": 24.7,
+    "REM": 7.2,
+    "online_dqn": 26.76,
+    "random": 0.0
+  },
+  "frostbite": {
+    "BC": 780.0,
+    "BCQ": 3520.0,
+    "DQN": 3230.0,
+    "IQN": 2630.0,
+    "REM": 3070.0,
+    "online_dqn": 1643.65,
+    "random": 71.99
+  },
+  "gopher": {
+    "BC": 4900.0,
+    "BCQ": 8700.0,
+    "DQN": 2400.0,
+    "IQN": 11300.0,
+    "REM": 3700.0,
+    "online_dqn": 8241.0,
+    "random": 282.57
+  },
+  "gravitar": {
+    "BC": 20.0,
+    "BCQ": 580.0,
+    "DQN": 500.0,
+    "IQN": 235.0,
+    "REM": 424.0,
+    "online_dqn": 310.56,
+    "random": 213.71
+  },
+  "hero": {
+    "BC": 13900.0,
+    "BCQ": 13200.0,
+    "DQN": 5200.0,
+    "IQN": 16200.0,
+    "REM": 14000.0,
+    "online_dqn": 16233.54,
+    "random": 719.15
+  },
+  "ice_hockey": {
+    "BC": -5.63,
+    "BCQ": -2.51,
+    "DQN": -2.88,
+    "IQN": -4.65,
+    "REM": -1.16,
+    "online_dqn": -4.02,
+    "random": -9.82
+  },
+  "jamesbond": {
+    "BC": 237.0,
+    "BCQ": 438.0,
+    "DQN": 490.0,
+    "IQN": 699.0,
+    "REM": 369.0,
+    "online_dqn": 777.73,
+    "random": 27.63
+  },
+  "kangaroo": {
+    "BC": 5690.0,
+    "BCQ": 1300.0,
+    "DQN": 820.0,
+    "IQN": 9120.0,
+    "REM": 1210.0,
+    "online_dqn": 14125.11,
+    "random": 41.3
+  },
+  "krull": {
+    "BC": 8500.0,
+    "BCQ": 7780.0,
+    "DQN": 7480.0,
+    "IQN": 8470.0,
+    "REM": 7980.0,
+    "online_dqn": 7238.51,
+    "random": 1556.92
+  },
+  "kung_fu_master": {
+    "BC": 5100.0,
+    "BCQ": 16900.0,
+    "DQN": 16100.0,
+    "IQN": 19500.0,
+    "REM": 19400.0,
+    "online_dqn": 26637.88,
+    "random": 556.31
+  },
+  "ms_pacman": {
+    "BC": 4040.0,
+    "BCQ": 3080.0,
+    "DQN": 2470.0,
+    "IQN": 4390.0,
+    "REM": 3150.0,
+    "online_dqn": 4171.53,
+    "random": 247.97
+  },
+  "name_this_game": {
+    "BC": 4100.0,
+    "BCQ": 12600.0,
+    "DQN": 11500.0,
+    "IQN": 9900.0,
+    "REM": 13000.0,
+    "online_dqn": 8645.09,
+    "random": 2401.05
+  },
+  "phoenix": {
+    "BC": 2940.0,
+    "BCQ": 6620.0,
+    "DQN": 6410.0,
+    "IQN": 4940.0,
+    "REM": 7480.0,
+    "online_dqn": 5122.3,
+    "random": 873.03
+  },
+  "pong": {
+    "BC": 18.9,
+    "BCQ": 16.5,
+    "DQN": 12.9,
+    "IQN": 19.2,
+    "REM": 16.5,
+    "online_dqn": 18.25,
+    "random": -20.3
+  },
+  "pooyan": {
+    "BC": 3850.0,
+    "BCQ": 4200.0,
+    "DQN": 3180.0,
+    "IQN": 5000.0,
+    "REM": 4470.0,
+    "online_dqn": 4135.32,
+    "random": 411.36
+  },
+  "qbert": {
+    "BC": 12600.0,
+    "BCQ": 12600.0,
+    "DQN": 10600.0,
+    "IQN": 13400.0,
+    "REM": 13100.0,
+    "online_dqn": 12275.13,
+    "random": 155.01
+  },
+  "riverraid": {
+    "BC": 6000.0,
+    "BCQ": 14200.0,
+    "DQN": 9100.0,
+    "IQN": 13000.0,
+    "REM": 14200.0,
+    "online_dqn": 12798.88,
+    "random": 1504.25
+  },
+  "road_runner": {
+    "BC": 19000.0,
+    "BCQ": 57400.0,
+    "DQN": 31700.0,
+    "IQN": 44700.0,
+    "REM": 56500.0,
+    "online_dqn": 47880.48,
+    "random": 15.46
+  },
+  "robotank": {
+    "BC": 15.7,
+    "BCQ": 60.7,
+    "DQN": 55.7,
+    "IQN": 42.7,
+    "REM": 60.5,
+    "online_dqn": 63.44,
+    "random": 2.01
+  },
+  "seaquest": {
+    "BC": 150.0,
+    "BCQ": 5410.0,
+    "DQN": 2870.0,
+    "IQN": 1670.0,
+    "REM": 5910.0,
+    "online_dqn": 3233.47,
+    "random": 81.78
+  },
+  "space_invaders": {
+    "BC": 790.0,
+    "BCQ": 2920.0,
+    "DQN": 2710.0,
+    "IQN": 2840.0,
+    "REM": 2810.0,
+    "online_dqn": 2044.63,
+    "random": 149.52
+  },
+  "star_gunner": {
+    "BC": 3000.0,
+    "BCQ": 2500.0,
+    "DQN": 1600.0,
+    "IQN": 39400.0,
+    "REM": 7500.0,
+    "online_dqn": 55103.84,
+    "random": 677.22
+  },
+  "time_pilot": {
+    "BC": 1950.0,
+    "BCQ": 5180.0,
+    "DQN": 5310.0,
+    "IQN": 3140.0,
+    "REM": 4490.0,
+    "online_dqn": 4160.51,
+    "random": 3450.95
+  },
+  "up_n_down": {
+    "BC": 16300.0,
+    "BCQ": 32500.0,
+    "DQN": 14600.0,
+    "IQN": 32300.0,
+    "REM": 27600.0,
+    "online_dqn": 15677.92,
+    "random": 513.94
+  },
+  "video_pinball": {
+    "BC": 27000.0,
+    "BCQ": 103000.0,
+    "DQN": 82000.0,
+    "IQN": 102000.0,
+    "REM": 313000.0,
+    "online_dqn": 335055.69,
+    "random": 26024.42
+  },
+  "wizard_of_wor": {
+    "BC": 730.0,
+    "BCQ": 4680.0,
+    "DQN": 2300.0,
+    "IQN": 1400.0,
+    "REM": 2730.0,
+    "online_dqn": 1787.79,
+    "random": 686.63
+  },
+  "yars_revenge": {
+    "BC": 19100.0,
+    "BCQ": 29100.0,
+    "DQN": 24900.0,
+    "IQN": 28400.0,
+    "REM": 23100.0,
+    "online_dqn": 26762.98,
+    "random": 3147.67
+  },
+  "zaxxon": {
+    "BC": 10.0,
+    "BCQ": 9430.0,
+    "DQN": 6050.0,
+    "IQN": 870.0,
+    "REM": 8300.0,
+    "online_dqn": 4681.93,
+    "random": 10.57
+  }
+}
