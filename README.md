@@ -16,7 +16,7 @@
 <img src="https://github.com/sail-sg/rosmo/actions/workflows/check.yml/badge.svg?branch=main" alt="Check status">
 </a>
 <a href="https://github.com/sail-sg/rosmo/blob/main/LICENSE">
-<img src="https://img.shields.io/github/license/sail-sg/rosmo">
+<img src="https://img.shields.io/github/license/sail-sg/rosmo" alt="License">
 </a>
 </p>
 
