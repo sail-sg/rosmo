@@ -29,7 +29,7 @@
     - [BSuite](#bsuite)
     - [Atari](#atari)
   - [License](#license)
-  - [Acknowldgement](#acknowldgement)
+  - [Acknowledgement](#acknowledgement)
   - [Disclaimer](#disclaimer)
 
 ## Introduction
@@ -66,7 +66,7 @@ python experiment/atari/main.py -exp_id test-sample-4 -sampling -env MsPacman -n
 
 `ROSMO` is distributed under the terms of the [Apache2](https://www.apache.org/licenses/LICENSE-2.0) license.
 
-## Acknowldgement
+## Acknowledgement
 
 We thank the following projects which provide great references:
 
