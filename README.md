@@ -17,6 +17,8 @@
 </a>
 <a href="https://github.com/sail-sg/rosmo/blob/main/LICENSE">
 <img src="https://img.shields.io/github/license/sail-sg/rosmo" alt="License">
+<a href="https://arxiv.org/abs/2210.05980">
+<img src="https://img.shields.io/badge/arXiv-2210.05980-b31b1b.svg" alt="Arxiv">
 </a>
 </p>
 
