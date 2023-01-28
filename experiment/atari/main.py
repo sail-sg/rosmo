@@ -40,11 +40,13 @@ from rosmo.env_loop_observer import (
     LearningStepObserver,
 )
 from rosmo.loggers import logger_fn
+from rosmo.profiler import Profiler
 from rosmo.type import ActorOutput
 
 # ===== Flags. ===== #
 FLAGS = flags.FLAGS
 flags.DEFINE_boolean("debug", True, "Debug run.")
+flags.DEFINE_boolean("profile", False, "Profile codes.")
 flags.DEFINE_boolean("use_wb", False, "Use WB to log.")
 flags.DEFINE_string("user", "username", "Wandb user id.")
 flags.DEFINE_string("project", "rosmo", "Wandb project id.")
@@ -105,7 +107,7 @@ def get_env_data_loader(config) -> Tuple[dm_env.Environment, Iterator]:
         run_number=config["run_number"],
         dataset_dir=config["data_dir"],
         stack_size=config["stack_size"],
-        data_percent=config["data_percentage"],
+        data_percentage=config["data_percentage"],
         trajectory_length=trajectory_length,
         shuffle_num_steps=5000 if FLAGS.debug else 50000,
     )
@@ -215,8 +217,12 @@ def main(_):
     init_step = 0
     save_path = os.path.join("./checkpoint", cfg["exp_full_name"])
     os.makedirs(save_path, exist_ok=True)
+    if FLAGS.profile:
+        profile_dir = "./profile"
+        os.makedirs(profile_dir, exist_ok=True)
+        profiler = Profiler(profile_dir, cfg["exp_full_name"], with_jax=True)
 
-    if FLAGS.use_wb and not FLAGS.debug:
+    if FLAGS.use_wb and not (FLAGS.debug or FLAGS.profile):
         wb_name = cfg["exp_full_name"]
         wb_cfg = cfg.to_dict()
 
@@ -237,12 +243,19 @@ def main(_):
         if (i + 1) % cfg["save_period"] == 0:
             with open(os.path.join(save_path, f"ckpt_{i}.pkl"), "wb") as f:
                 pickle.dump(learner.save(), f)
-
-        if FLAGS.debug or (i + 1) % cfg["eval_period"] == 0:
+        if (i + 1) % cfg["eval_period"] == 0:
             actor.update_params(learner.save().params)
             eval_loop.run(evaluate_episodes)
 
-        if FLAGS.debug:
+        if FLAGS.profile:
+            if i == 100:
+                profiler.start()
+            if i == 200:
+                profiler.stop_and_save()
+                break
+        elif FLAGS.debug:
+            actor.update_params(learner.save().params)
+            eval_loop.run(evaluate_episodes)
             break
 
     # ===== Cleanup. ===== #
