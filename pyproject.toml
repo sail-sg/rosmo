@@ -41,6 +41,7 @@ dependencies = [
   "dm-sonnet==2.0.0",
   "mujoco-py<2.2,>=2.1",
   "bsuite==0.3.5",
+  "viztracer==0.15.6",
 ]
 dynamic = ["version"]
 
