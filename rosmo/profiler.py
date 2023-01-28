@@ -23,8 +23,7 @@ class Profiler:
     """Profiler for python and jax (optional)."""
 
     def __init__(self, folder: str, name: str, with_jax: bool = False) -> None:
-        """Initial method."""
-
+        """Init."""
         super().__init__()
         self._name = name
         self._folder = folder
