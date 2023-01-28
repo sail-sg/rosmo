@@ -30,6 +30,7 @@
   - [Usage](#usage)
     - [BSuite](#bsuite)
     - [Atari](#atari)
+  - [Citation](#citation)
   - [License](#license)
   - [Acknowledgement](#acknowledgement)
   - [Disclaimer](#disclaimer)
@@ -62,6 +63,20 @@ python experiment/atari/main.py -exp_id test -env MsPacman -nodebug -use_wb -use
 2. Train with sampled policy target (N=4).
 ```console
 python experiment/atari/main.py -exp_id test-sample-4 -sampling -env MsPacman -nodebug -use_wb -user ${WB_USER}
+```
+
+## Citation
+
+If you find this work useful for your research, please consider citing
+```
+@inproceedings{
+  liu2023rosmo,
+  title={Efficient Offline Policy Optimization with a Learned Model},
+  author={Zichen Liu and Siyi Li and Wee Sun Lee and Shuicheng Yan and Zhongwen Xu},
+  booktitle={International Conference on Learning Representations},
+  year={2023},
+  url={https://arxiv.org/abs/2210.05980}
+}
 ```
 
 ## License

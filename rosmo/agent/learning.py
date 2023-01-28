@@ -295,7 +295,7 @@ class RosmoLearner(acme.core.Learner):
             target_params: Params,
             trajectory: ActorOutput,
             rng_key: networks_lib.PRNGKey,
-        ) -> Tuple[Array, Dict[str, Array]]:
+        ) -> Tuple[jnp.ndarray, Dict[str, jnp.ndarray]]:
             bs = len(trajectory.reward)
             rng_keys = jax.random.split(rng_key, bs)
             losses, log = jax.vmap(loss, (None, None, 0, 0))(
