@@ -18,7 +18,18 @@
 pip install -e .
 ```
 3. [Install the ROM for Atari](https://github.com/openai/atari-py#roms).
-4. (Optional) Download **BSuite** [datasets](https://drive.google.com/file/d/1FWexoOphUgBaWTWtY9VR43N90z9A6FvP/view?usp=sharing) if you are running BSuite experiments; **Atari** datasets will be automatically downloaded from [TFDS](https://www.tensorflow.org/datasets/catalog/rlu_atari). The dataset path is defined in `experiment/*/config.py`.
+4. Download dataset:
+   1. **BSuite** datasets ([drive](https://drive.google.com/file/d/1FWexoOphUgBaWTWtY9VR43N90z9A6FvP/view?usp=sharing)) if you are running BSuite experiments; 
+   2. **Atari** datasets will be automatically downloaded from [TFDS](https://www.tensorflow.org/datasets/catalog/rlu_atari) when starting the experiment. The dataset path is defined in `experiment/*/config.py`. Or you could also download it using the following script:
+      ```
+      from rosmo.data.rlu_atari import create_atari_ds_loader
+
+      create_atari_ds_loader(
+          env_name="Pong",  # Change this.
+          run_number=1,  # Fix this.
+          dataset_dir="/path/to/download",
+      )
+      ```
 
 ### TPU
 

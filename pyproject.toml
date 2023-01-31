@@ -42,6 +42,7 @@ dependencies = [
   "mujoco-py<2.2,>=2.1",
   "bsuite==0.3.5",
   "viztracer==0.15.6",
+  "mctx==0.0.2",
 ]
 dynamic = ["version"]
 
