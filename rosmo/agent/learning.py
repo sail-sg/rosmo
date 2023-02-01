@@ -173,7 +173,9 @@ class RosmoLearner(acme.core.Learner):
             rng_key, improve_key = jax.random.split(rng_key)
 
             if use_mcts:
-                logging.info(f"[Learning] Using MuZero.")
+                logging.info(
+                    f"[Learning] Using MuZero with simulation={num_simulations} & depth={search_depth}."
+                )
                 mcts_out = mcts_improve(
                     networks,
                     improve_key,
