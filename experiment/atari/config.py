@@ -33,6 +33,7 @@ def get_config(game_name: str) -> Dict:
     config["mcts"] = FLAGS.algo == "mzu"
     config["game_name"] = game_name
     config["num_simulations"] = FLAGS.num_simulations
+    config["search_depth"] = FLAGS.search_depth or FLAGS.num_simulations
     config["batch_size"] = 16 if FLAGS.debug else config["batch_size"]
     exp_full_name = f"{FLAGS.exp_id}_{game_name}_" + generate_id()
     config["exp_full_name"] = exp_full_name
