@@ -13,7 +13,13 @@
 # limitations under the License.
 
 """Atari experiment entry."""
+
 import os
+
+os.environ["XLA_PYTHON_CLIENT_PREALLOCATE"] = "false"
+os.environ["TF_FORCE_GPU_ALLOW_GROWTH"] = "true"
+
+
 import pickle
 import random
 import time
@@ -57,7 +63,7 @@ flags.DEFINE_integer("seed", int(time.time()), "Random seed.")
 
 flags.DEFINE_boolean("sampling", False, "Whether to sample policy target.")
 flags.DEFINE_integer("num_simulations", 4, "Simulation budget.")
-
+flags.DEFINE_enum("algo", "rosmo", ["rosmo", "mzu"], "Algorithm to use.")
 
 # ===== Learner. ===== #
 def get_learner(config, networks, data_iterator, logger) -> RosmoLearner:

@@ -64,6 +64,10 @@ python experiment/atari/main.py -exp_id test -env MsPacman -nodebug -use_wb -use
 ```console
 python experiment/atari/main.py -exp_id test-sample-4 -sampling -env MsPacman -nodebug -use_wb -user ${WB_USER}
 ```
+3. Train with MuZero unplugged for benchmark (N=16).
+```console
+python experiment/atari/main.py -exp_id test-mzu algo mzu -env MsPacman -nodebug -use_wb -user ${WB_USER}
+```
 
 ## Citation
 
