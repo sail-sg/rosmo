@@ -45,6 +45,7 @@ Please follow the [installation guide](INSTALL.md).
 ## Usage
 ### BSuite
 
+To run the BSuite experiments, please ensure you have downloaded the [datasets](https://drive.google.com/file/d/1FWexoOphUgBaWTWtY9VR43N90z9A6FvP/view?usp=sharing) and placed them at the directory defined by `CONFIG.data_dir` in `experiment/bsuite/config.py`
 1. Debug run.
 ```console
 python experiment/bsuite/main.py -exp_id test -env cartpole
@@ -56,13 +57,19 @@ python experiment/bsuite/main.py -exp_id test -env cartpole -nodebug -use_wb -us
 
 ### Atari
 
-1. Train with exact policy target.
+The following commands are examples to train a ROSMO agent, its sampling variant, and a MZU agent on the game `MsPacman`.
+
+1. Train ROSMO with exact policy target.
 ```console
-python experiment/atari/main.py -exp_id test -env MsPacman -nodebug -use_wb -user ${WB_USER}
+python experiment/atari/main.py -exp_id rosmo -env MsPacman -nodebug -use_wb -user ${WB_USER}
 ```
-2. Train with sampled policy target (N=4).
+2. Train ROSMO with sampled policy target (N=4).
 ```console
-python experiment/atari/main.py -exp_id test-sample-4 -sampling -env MsPacman -nodebug -use_wb -user ${WB_USER}
+python experiment/atari/main.py -exp_id rosmo-sample-4 -sampling -env MsPacman -nodebug -use_wb -user ${WB_USER}
+```
+3. Train MuZero Unplugged (N=20).
+```console
+python experiment/atari/main.py -exp_id mzu-sample-20 -use_mcts -env MsPacman -nodebug -use_wb -user ${WB_USER}
 ```
 
 ## Citation

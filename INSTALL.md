@@ -31,7 +31,7 @@ pip install "jax[tpu]==0.3.6" -f https://storage.googleapis.com/jax-releases/lib
 
 ### GPU
 
-We also conducted verification experiments on 4 Tesla-V100 GPUs to ensure our algorithm's reproducibility on different platforms. To install the same version of Jax as ours:
+We also conducted verification experiments on 4 Tesla-A100 GPUs to ensure our algorithm's reproducibility on different platforms. To install the same version of Jax as ours:
 ```console
 pip uninstall jax jaxlib libtpu-nightly libtpu -y
 

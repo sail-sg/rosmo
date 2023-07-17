@@ -25,7 +25,7 @@ from absl import logging
 from acme import types
 from acme.jax import networks as networks_lib
 
-from rosmo.agent.learning import one_step_improve, root_unroll
+from rosmo.agent.learning import mcts_improve, one_step_improve, root_unroll
 from rosmo.agent.network import Networks
 from rosmo.agent.type import AgentOutput, Params
 from rosmo.type import ActorOutput, Array
@@ -52,13 +52,15 @@ class RosmoEvalActor(acme.core.Actor):
         discount_factor = config["discount_factor"]
         sampling = config.get("sampling", False)
         num_simulations = config.get("num_simulations", -1)
+        use_mcts = config.get("use_mcts", False)
+        search_depth = config.get("search_depth", None)
 
         def root_step(
             rng_key: chex.PRNGKey,
             params: Params,
             timesteps: ActorOutput,
         ) -> Tuple[Array, AgentOutput]:
-            # Model one-step look-ahead for acting.
+            # Model one-step look-ahead or monte-carlo tree search for acting.
             trajectory = jax.tree_map(
                 lambda t: t[None], timesteps
             )  # Add a dummy time dimension.
@@ -70,25 +72,39 @@ class RosmoEvalActor(acme.core.Actor):
             )
             improve_key, sample_key = jax.random.split(rng_key)
 
-            agent_out: AgentOutput = jax.tree_map(
-                lambda t: t.squeeze(axis=0), agent_out
-            )  # Squeeze the dummy time dimension.
-            if not sampling:
-                logging.info("[Actor] Using onestep improvement.")
-                improved_policy, _ = one_step_improve(
+            if use_mcts:
+                logging.info("[Actor] Using mcts improvement.")
+                mcts_out = mcts_improve(
                     self._networks,
                     improve_key,
                     params,
-                    agent_out,
                     num_bins,
+                    agent_out,
                     discount_factor,
                     num_simulations,
-                    sampling,
+                    search_depth,
                 )
+                action = mcts_out.action
             else:
-                logging.info("[Actor] Using policy.")
-                improved_policy = jax.nn.softmax(agent_out.policy_logits)
-            action = rlax.categorical_sample(sample_key, improved_policy)
+                agent_out: AgentOutput = jax.tree_map(
+                    lambda t: t.squeeze(axis=0), agent_out
+                )  # Squeeze the dummy time dimension.
+                if not sampling:
+                    logging.info("[Actor] Using onestep improvement.")
+                    improved_policy, _ = one_step_improve(
+                        self._networks,
+                        improve_key,
+                        params,
+                        agent_out,
+                        num_bins,
+                        discount_factor,
+                        num_simulations,
+                        sampling,
+                    )
+                else:
+                    logging.info("[Actor] Using policy.")
+                    improved_policy = jax.nn.softmax(agent_out.policy_logits)
+                action = rlax.categorical_sample(sample_key, improved_policy)
             return action, agent_out
 
         def batch_step(

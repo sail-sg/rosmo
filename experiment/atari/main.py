@@ -58,6 +58,8 @@ flags.DEFINE_integer("seed", int(time.time()), "Random seed.")
 flags.DEFINE_boolean("sampling", False, "Whether to sample policy target.")
 flags.DEFINE_integer("num_simulations", 4, "Simulation budget.")
 
+flags.DEFINE_boolean("use_mcts", False, "To train a muzero unplugged agent.")
+
 
 # ===== Learner. ===== #
 def get_learner(config, networks, data_iterator, logger) -> RosmoLearner:
@@ -177,7 +179,7 @@ def get_logger_fn(
 def main(_):
     """Main program."""
     platform = jax.lib.xla_bridge.get_backend().platform
-    num_devices = jax.lib.xla_bridge.device_count()
+    num_devices = jax.device_count()
     logging.warn(f"Compute platform: {platform} with {num_devices} devices.")
     logging.info(f"Debug mode: {FLAGS.debug}")
     random.seed(FLAGS.seed)
