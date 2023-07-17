@@ -27,7 +27,6 @@ dependencies = [
   "dm-acme==0.4.0",
   "dm-launchpad-nightly==0.3.0.dev20220321",
   "dm-haiku==0.0.7",
-  "dopamine-rl==3.1.2",
   "mctx==0.0.2",
   "gym==0.17.2",
   "gin-config==0.3.0",
