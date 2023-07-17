@@ -114,7 +114,7 @@ def main(_):
     np.random.seed(FLAGS.seed)
 
     platform = jax.lib.xla_bridge.get_backend().platform
-    num_devices = jax.lib.xla_bridge.device_count()
+    num_devices = jax.device_count()
     logging.warn(f"Compute platform: {platform} with {num_devices} devices.")
 
     # ===== Setup. ===== #

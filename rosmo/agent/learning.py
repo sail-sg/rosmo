@@ -174,7 +174,8 @@ class RosmoLearner(acme.core.Learner):
 
             if use_mcts:
                 logging.info(
-                    f"[Learning] Using MuZero with simulation={num_simulations} & depth={search_depth}."
+                    f"[Learning] Using MuZero with simulation={num_simulations}"
+                    f" & depth={search_depth}."
                 )
                 mcts_out = mcts_improve(
                     networks,
@@ -191,11 +192,11 @@ class RosmoLearner(acme.core.Learner):
                     0.0,
                 )
             else:
-                logging.info(f"[Learning] Using ROSMO.")
+                logging.info("[Learning] Using ROSMO.")
                 improve_keys = jax.random.split(
                     improve_key, search_roots.state.shape[0]
                 )
-                policy_target, improve_adv = jax.vmap(
+                policy_target, improve_adv = jax.vmap(  # type: ignore
                     one_step_improve,
                     (None, 0, None, 0, None, None, None, None),
                 )(
@@ -251,7 +252,7 @@ class RosmoLearner(acme.core.Learner):
             value_logits_target = jax.lax.stop_gradient(value_logits_target)
 
             # 3) Behavior regularization.
-            behavior_loss = 0.0
+            behavior_loss = jnp.array(0.0)
             if not use_mcts:
                 in_sample_action = trajectory.action[: unroll_steps + 1]
                 log_prob = jax.nn.log_softmax(policy_logits)
@@ -301,9 +302,14 @@ class RosmoLearner(acme.core.Learner):
 
             if sampling:
                 # Unnormalized.
-                entropy_fn = lambda p: distrax.Categorical(logits=p).entropy()
+                def entropy_fn(p: Array) -> Array:
+                    return distrax.Categorical(logits=p).entropy()
+
             else:
-                entropy_fn = lambda p: distrax.Categorical(probs=p).entropy()
+
+                def entropy_fn(p: Array) -> Array:
+                    return distrax.Categorical(probs=p).entropy()
+
             policy_target_entropy = jax.vmap(entropy_fn)(policy_target)
             policy_entropy = jax.vmap(
                 lambda l: distrax.Categorical(logits=l).entropy()
@@ -395,7 +401,7 @@ class RosmoLearner(acme.core.Learner):
 
         # JIT compiler.
         self._batch_size = batch_size
-        self._num_devices = jax.lib.xla_bridge.device_count()
+        self._num_devices = jax.device_count()
         assert self._batch_size % self._num_devices == 0
         self._update_step = jax.pmap(update_step, axis_name="i")
 

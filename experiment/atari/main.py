@@ -15,11 +15,6 @@
 """Atari experiment entry."""
 
 import os
-
-os.environ["XLA_PYTHON_CLIENT_PREALLOCATE"] = "false"
-os.environ["TF_FORCE_GPU_ALLOW_GROWTH"] = "true"
-
-
 import pickle
 import random
 import time
@@ -189,7 +184,7 @@ def get_logger_fn(
 def main(_):
     """Main program."""
     platform = jax.lib.xla_bridge.get_backend().platform
-    num_devices = jax.lib.xla_bridge.device_count()
+    num_devices = jax.device_count()
     logging.warn(f"Compute platform: {platform} with {num_devices} devices.")
     logging.info(f"Debug mode: {FLAGS.debug}")
     random.seed(FLAGS.seed)
