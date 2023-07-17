@@ -17,11 +17,11 @@ import time
 from typing import Any, Dict, Iterator, List, NamedTuple, Optional, Tuple
 
 import acme
-import chex
 import distrax
 import haiku as hk
 import jax
 import jax.numpy as jnp
+import mctx
 import optax
 import rlax
 import tree
@@ -30,6 +30,7 @@ from acme.jax import networks as networks_lib
 from acme.jax import utils
 from acme.utils import loggers
 
+from rosmo.agent.improvement_op import mcts_improve, one_step_improve
 from rosmo.agent.network import Networks
 from rosmo.agent.type import AgentOutput, Params
 from rosmo.agent.utils import (
@@ -82,8 +83,10 @@ class RosmoLearner(acme.core.Learner):
         batch_size = config["batch_size"]
         max_grad_norm = config["max_grad_norm"]
         num_bins = config["num_bins"]
+        use_mcts = config["mcts"]
         sampling = config.get("sampling", False)
         num_simulations = config.get("num_simulations", -1)
+        search_depth = config.get("search_depth", num_simulations)
 
         _batch_categorical_cross_entropy = jax.vmap(rlax.categorical_cross_entropy)
 
@@ -169,20 +172,43 @@ class RosmoLearner(acme.core.Learner):
             )
             rng_key, improve_key = jax.random.split(rng_key)
 
-            improve_keys = jax.random.split(improve_key, search_roots.state.shape[0])
-            policy_target, improve_adv = jax.vmap(
-                one_step_improve,
-                (None, 0, None, 0, None, None, None, None),
-            )(
-                networks,
-                improve_keys,
-                target_params,
-                search_roots,
-                num_bins,
-                discount_factor,
-                num_simulations,
-                sampling,
-            )
+            if use_mcts:
+                logging.info(
+                    f"[Learning] Using MuZero with simulation={num_simulations}"
+                    f" & depth={search_depth}."
+                )
+                mcts_out = mcts_improve(
+                    networks,
+                    improve_key,
+                    target_params,
+                    target_roots,
+                    num_bins,
+                    discount_factor,
+                    num_simulations,
+                    search_depth,
+                )
+                policy_target, improve_adv = (
+                    mcts_out.action_weights[: unroll_steps + 1],
+                    0.0,
+                )
+            else:
+                logging.info("[Learning] Using ROSMO.")
+                improve_keys = jax.random.split(
+                    improve_key, search_roots.state.shape[0]
+                )
+                policy_target, improve_adv = jax.vmap(  # type: ignore
+                    one_step_improve,
+                    (None, 0, None, 0, None, None, None, None),
+                )(
+                    networks,
+                    improve_keys,
+                    target_params,
+                    search_roots,
+                    num_bins,
+                    discount_factor,
+                    num_simulations,
+                    sampling,
+                )
             uniform_policy = jnp.ones_like(policy_target) / num_actions
             random_policy_mask = jnp.cumprod(1.0 - unroll_trajectory.is_last) == 0.0
             random_policy_mask = jnp.broadcast_to(
@@ -195,7 +221,11 @@ class RosmoLearner(acme.core.Learner):
 
             # c) Value.
             discounts = (1.0 - trajectory.is_last[1:]) * discount_factor
-            v_bootstrap = target_roots.value
+            if use_mcts:
+                node_values = mcts_out.search_tree.node_values
+                v_bootstrap = node_values[:, mctx.Tree.ROOT_INDEX]
+            else:
+                v_bootstrap = target_roots.value
 
             def n_step_return(i: int) -> jnp.ndarray:
                 bootstrap_value = jax.tree_map(lambda t: t[i + td_steps], v_bootstrap)
@@ -222,26 +252,32 @@ class RosmoLearner(acme.core.Learner):
             value_logits_target = jax.lax.stop_gradient(value_logits_target)
 
             # 3) Behavior regularization.
-            in_sample_action = trajectory.action[: unroll_steps + 1]
-            log_prob = jax.nn.log_softmax(policy_logits)
-            action_log_prob = log_prob[jnp.arange(unroll_steps + 1), in_sample_action]
+            behavior_loss = jnp.array(0.0)
+            if not use_mcts:
+                in_sample_action = trajectory.action[: unroll_steps + 1]
+                log_prob = jax.nn.log_softmax(policy_logits)
+                action_log_prob = log_prob[
+                    jnp.arange(unroll_steps + 1), in_sample_action
+                ]
 
-            _target_value = target_roots.value[: unroll_steps + 1]
-            _target_reward = target_roots.reward[1 : unroll_steps + 1 + 1]
-            _target_value_prime = target_roots.value[1 : unroll_steps + 1 + 1]
-            _target_adv = (
-                _target_reward + discount_factor * _target_value_prime - _target_value
-            )
-            _target_adv = jax.lax.stop_gradient(_target_adv)
-            behavior_loss = -action_log_prob * jnp.heaviside(_target_adv, 0.0)
-            # Deal with cross-episode trajectories.
-            invalid_action_mask = jnp.cumprod(1.0 - trajectory.is_first[1:]) == 0.0
-            behavior_loss = jax.lax.select(
-                invalid_action_mask[: unroll_steps + 1],
-                jnp.zeros_like(behavior_loss),
-                behavior_loss,
-            )
-            behavior_loss = jnp.mean(behavior_loss) * behavior_coef
+                _target_value = target_roots.value[: unroll_steps + 1]
+                _target_reward = target_roots.reward[1 : unroll_steps + 1 + 1]
+                _target_value_prime = target_roots.value[1 : unroll_steps + 1 + 1]
+                _target_adv = (
+                    _target_reward
+                    + discount_factor * _target_value_prime
+                    - _target_value
+                )
+                _target_adv = jax.lax.stop_gradient(_target_adv)
+                behavior_loss = -action_log_prob * jnp.heaviside(_target_adv, 0.0)
+                # Deal with cross-episode trajectories.
+                invalid_action_mask = jnp.cumprod(1.0 - trajectory.is_first[1:]) == 0.0
+                behavior_loss = jax.lax.select(
+                    invalid_action_mask[: unroll_steps + 1],
+                    jnp.zeros_like(behavior_loss),
+                    behavior_loss,
+                )
+                behavior_loss = jnp.mean(behavior_loss) * behavior_coef
 
             # 4) Compute the losses.
             reward_loss = jnp.mean(
@@ -266,9 +302,14 @@ class RosmoLearner(acme.core.Learner):
 
             if sampling:
                 # Unnormalized.
-                entropy_fn = lambda p: distrax.Categorical(logits=p).entropy()
+                def entropy_fn(p: Array) -> Array:
+                    return distrax.Categorical(logits=p).entropy()
+
             else:
-                entropy_fn = lambda p: distrax.Categorical(probs=p).entropy()
+
+                def entropy_fn(p: Array) -> Array:
+                    return distrax.Categorical(probs=p).entropy()
+
             policy_target_entropy = jax.vmap(entropy_fn)(policy_target)
             policy_entropy = jax.vmap(
                 lambda l: distrax.Categorical(logits=l).entropy()
@@ -360,7 +401,7 @@ class RosmoLearner(acme.core.Learner):
 
         # JIT compiler.
         self._batch_size = batch_size
-        self._num_devices = jax.lib.xla_bridge.device_count()
+        self._num_devices = jax.device_count()
         assert self._batch_size % self._num_devices == 0
         self._update_step = jax.pmap(update_step, axis_name="i")
 
@@ -561,106 +602,3 @@ def model_unroll(
         value_logits=value_logits,
         value=value,
     )
-
-
-def model_simulate(
-    networks: Networks,
-    params: Params,
-    num_bins: int,
-    state: Array,
-    actions_to_simulate: Array,
-) -> AgentOutput:
-    """Simulate the learned model using one-step look-ahead."""
-
-    def fn(state: Array, action: Array) -> Array:
-        """Dynamics fun for vmap."""
-        next_state = networks.transition_network.apply(
-            params.transition, action[None], state
-        )
-        return next_state
-
-    states_imagined = jax.vmap(fn, (None, 0))(state, actions_to_simulate)
-
-    (
-        policy_logits,
-        reward_logits,
-        value_logits,
-    ) = networks.prediction_network.apply(params.prediction, states_imagined)
-    reward = logits_to_scalar(reward_logits, num_bins)
-    reward = inv_value_transform(reward)
-    value = logits_to_scalar(value_logits, num_bins)
-    value = inv_value_transform(value)
-    return AgentOutput(
-        state=states_imagined,
-        policy_logits=policy_logits,
-        reward_logits=reward_logits,
-        reward=reward,
-        value_logits=value_logits,
-        value=value,
-    )
-
-
-def one_step_improve(
-    networks: Networks,
-    rng_key: networks_lib.PRNGKey,
-    params: Params,
-    model_root: AgentOutput,
-    num_bins: int,
-    discount_factor: float,
-    num_simulations: int = -1,
-    sampling: bool = False,
-) -> Tuple[Array, Array]:
-    """Obtain the one-step look-ahead target policy."""
-    environment_specs = networks.environment_specs
-
-    pi_prior = jax.nn.softmax(model_root.policy_logits)
-    value_prior = model_root.value
-
-    if sampling:
-        assert num_simulations > 0
-        logging.info(
-            f"[Sample] Using {num_simulations} samples to estimate improvement."
-        )
-        pi_sample = distrax.Categorical(probs=pi_prior)
-        sample_acts = pi_sample.sample(seed=rng_key, sample_shape=num_simulations)
-        sample_one_step_out: AgentOutput = model_simulate(
-            networks, params, num_bins, model_root.state, sample_acts
-        )
-        sample_adv = (
-            sample_one_step_out.reward
-            + discount_factor * sample_one_step_out.value
-            - value_prior
-        )
-        adv = sample_adv  # for log
-        sample_exp_adv = jnp.exp(sample_adv)
-        normalizer_raw = (jnp.sum(sample_exp_adv) + 1) / num_simulations
-        coeff = jnp.zeros_like(pi_prior)
-
-        def body(i: int, val: jnp.ndarray) -> jnp.ndarray:
-            """Body fun for the loop."""
-            normalizer_i = normalizer_raw - sample_exp_adv[i] / num_simulations
-            delta = jnp.zeros_like(val)
-            delta = delta.at[sample_acts[i]].set(sample_exp_adv[i] / normalizer_i)
-            return val + delta
-
-        coeff = jax.lax.fori_loop(0, num_simulations, body, coeff)
-        pi_improved = coeff / num_simulations
-    else:
-        all_actions = jnp.arange(environment_specs.actions.num_values)
-        model_one_step_out: AgentOutput = model_simulate(
-            networks, params, num_bins, model_root.state, all_actions
-        )
-        chex.assert_equal_shape([model_one_step_out.reward, pi_prior])
-        chex.assert_equal_shape([model_one_step_out.value, pi_prior])
-        adv = (
-            model_one_step_out.reward
-            + discount_factor * model_one_step_out.value
-            - value_prior
-        )
-        pi_improved = pi_prior * jnp.exp(adv)
-        pi_improved = pi_improved / jnp.sum(pi_improved)
-
-    chex.assert_equal_shape([pi_improved, pi_prior])
-    # pi_improved here might not sum to 1, in which case we use CE
-    # to conveniently calculate the policy gradients (Eq. 9)
-    return pi_improved, adv

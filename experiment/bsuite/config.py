@@ -29,6 +29,7 @@ def get_config(game_name: str) -> Dict:
     config = deepcopy(CONFIG)
     config["seed"] = FLAGS.seed
     config["benchmark"] = "bsuite"
+    config["mcts"] = FLAGS.algo == "mzu"
     config["game_name"] = game_name
     config["batch_size"] = 16 if FLAGS.debug else config.batch_size
     exp_full_name = f"{FLAGS.exp_id}_{game_name}_" + generate_id()

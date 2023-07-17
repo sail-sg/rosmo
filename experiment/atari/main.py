@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Atari experiment entry."""
+
 import os
 import pickle
 import random
@@ -57,7 +58,13 @@ flags.DEFINE_integer("seed", int(time.time()), "Random seed.")
 
 flags.DEFINE_boolean("sampling", False, "Whether to sample policy target.")
 flags.DEFINE_integer("num_simulations", 4, "Simulation budget.")
-
+flags.DEFINE_enum("algo", "rosmo", ["rosmo", "mzu"], "Algorithm to use.")
+flags.DEFINE_integer(
+    "search_depth",
+    0,
+    "Depth of Monte-Carlo Tree Search (only for mzu), \
+        defaults to num_simulations.",
+)
 
 # ===== Learner. ===== #
 def get_learner(config, networks, data_iterator, logger) -> RosmoLearner:
@@ -71,7 +78,7 @@ def get_learner(config, networks, data_iterator, logger) -> RosmoLearner:
     return learner
 
 
-# ===== Eval Actor-Env Loop. ===== #
+# ===== Eval Actor-Env Loop & Observer. ===== #
 def get_actor_env_eval_loop(
     config, networks, environment, observers, logger
 ) -> Tuple[RosmoEvalActor, EnvironmentLoop]:
@@ -98,7 +105,7 @@ def get_env_loop_observers() -> List[ExtendedEnvLoopObserver]:
     return observers
 
 
-# ===== Environment & Dataloader ===== #
+# ===== Environment & Dataloader. ===== #
 def get_env_data_loader(config) -> Tuple[dm_env.Environment, Iterator]:
     """Get environment and trajectory data loader."""
     trajectory_length = config["unroll_steps"] + config["td_steps"] + 1
@@ -134,7 +141,7 @@ def get_env_data_loader(config) -> Tuple[dm_env.Environment, Iterator]:
     return environment, iterator
 
 
-# ===== Network ===== #
+# ===== Network. ===== #
 def get_networks(config, environment) -> Networks:
     """Get environment-specific networks."""
     environment_spec = make_environment_spec(environment)
@@ -177,7 +184,7 @@ def get_logger_fn(
 def main(_):
     """Main program."""
     platform = jax.lib.xla_bridge.get_backend().platform
-    num_devices = jax.lib.xla_bridge.device_count()
+    num_devices = jax.device_count()
     logging.warn(f"Compute platform: {platform} with {num_devices} devices.")
     logging.info(f"Debug mode: {FLAGS.debug}")
     random.seed(FLAGS.seed)

@@ -220,14 +220,14 @@ class _AtariDopamineWrapper(dm_env.Environment):
         self._episode_steps = 0
         self._reset_next_step = False
         observation = self._env.reset()
-        return dm_env.restart(observation.squeeze(-1))
+        return dm_env.restart(observation.squeeze(-1))  # type: ignore
 
     def step(self, action: Union[int, Array]) -> dm_env.TimeStep:
         if self._reset_next_step:
             return self.reset()
         if not isinstance(action, int):
             action = action.item()
-        observation, reward, terminal, _ = self._env.step(action)
+        observation, reward, terminal, _ = self._env.step(action)  # type: ignore
         observation = observation.squeeze(-1)
         discount = 1 - float(terminal)
         self._episode_steps += 1
@@ -241,10 +241,10 @@ class _AtariDopamineWrapper(dm_env.Environment):
 
     def observation_spec(self) -> specs.Array:
         space = self._env.observation_space
-        return specs.Array(space.shape[:-1], space.dtype)
+        return specs.Array(space.shape[:-1], space.dtype)  # type: ignore
 
     def action_spec(self) -> specs.DiscreteArray:
-        return specs.DiscreteArray(self._env.action_space.n)
+        return specs.DiscreteArray(self._env.action_space.n)  # type: ignore
 
     def render(self, mode: str = "rgb_array") -> Any:
         """Render the environment.
