@@ -16,6 +16,10 @@
 2. Clone this repository and install it in develop mode:
 ```console
 pip install -e .
+
+# Install the following packages separately due to version conflicts.
+pip install dopamine-rl==3.1.2
+pip install chex==0.1.5
 ```
 3. [Install the ROM for Atari](https://github.com/openai/atari-py#roms).
 4. Download dataset:
