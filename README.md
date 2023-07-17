@@ -37,7 +37,7 @@
 
 ## Introduction
 
-This repository contains the implementation of ROSMO, a **R**egularized **O**ne-**S**tep **M**odel-based algorithm for **O**ffline-RL, introduced in our paper "Efficient Offline Policy Optimization with a Learned Model". We provide the training codes for both Atari and BSuite experiments, and have made the reproduced results publicly available at [W&B](https://wandb.ai/lkevinzc/rosmo).
+This repository contains the implementation of ROSMO, a **R**egularized **O**ne-**S**tep **M**odel-based algorithm for **O**ffline-RL, introduced in our paper "Efficient Offline Policy Optimization with a Learned Model". We provide the training codes for both Atari and BSuite experiments, and have made the reproduced results on `Atari MsPacman` publicly available at [W&B](https://wandb.ai/lkevinzc/rosmo-public).
 
 ## Installation
 Please follow the [installation guide](INSTALL.md).
@@ -45,7 +45,7 @@ Please follow the [installation guide](INSTALL.md).
 ## Usage
 ### BSuite
 
-To run the BSuite experiments, please ensure you have downloaded the [datasets](https://drive.google.com/file/d/1FWexoOphUgBaWTWtY9VR43N90z9A6FvP/view?usp=sharing) and placed them at the directory defined by `CONFIG.data_dir` in `experiment/bsuite/config.py`
+To run the BSuite experiments, please ensure you have downloaded the [datasets](https://drive.google.com/file/d/1FWexoOphUgBaWTWtY9VR43N90z9A6FvP/view?usp=sharing) and placed them at the directory defined by `CONFIG.data_dir` in `experiment/bsuite/config.py`.
 1. Debug run.
 ```console
 python experiment/bsuite/main.py -exp_id test -env cartpole
@@ -57,7 +57,7 @@ python experiment/bsuite/main.py -exp_id test -env cartpole -nodebug -use_wb -us
 
 ### Atari
 
-The following commands are examples to train a ROSMO agent, its sampling variant, and a MZU agent on the game `MsPacman`.
+The following commands are examples to train 1) a ROSMO agent, 2) its sampling variant, and 3) a MZU agent on the game `MsPacman`.
 
 1. Train ROSMO with exact policy target.
 ```console
