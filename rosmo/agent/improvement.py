@@ -155,7 +155,7 @@ def mcts_improve(
     ) -> Tuple[mctx.RecurrentFnOutput, Array]:
         del rng_key
 
-        def fn(state: Array, action: Array):
+        def fn(state: Array, action: Array) -> Array:
             next_state = networks.transition_network.apply(
                 params.transition, action[None], state
             )

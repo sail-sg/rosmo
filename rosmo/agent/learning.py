@@ -88,7 +88,8 @@ class RosmoLearner(acme.core.Learner):
         use_mcts = config.get("use_mcts", False)
         search_depth = config.get("search_depth", None)
 
-        _batch_categorical_cross_entropy = jax.vmap(rlax.categorical_cross_entropy)
+        _batch_categorical_cross_entropy = jax.vmap(
+            rlax.categorical_cross_entropy)
 
         def loss(
             params: Params,
@@ -107,7 +108,8 @@ class RosmoLearner(acme.core.Learner):
             # 1) Model unroll, sampling and estimation.
             root_state = jax.tree_map(lambda t: t[:1], state)
             learner_root = root_unroll(networks, params, num_bins, root_state)
-            learner_root: AgentOutput = jax.tree_map(lambda t: t[0], learner_root)
+            learner_root: AgentOutput = jax.tree_map(
+                lambda t: t[0], learner_root)
 
             unroll_trajectory: ActorOutput = jax.tree_map(
                 lambda t: t[: unroll_steps + 1], trajectory
@@ -185,12 +187,12 @@ class RosmoLearner(acme.core.Learner):
                     search_depth,
                 )
                 policy_target = mcts_out.action_weights[: unroll_steps + 1]
-                improve_adv = 0.0  # For logging.
+                improve_adv = jnp.array(0.)  # For logging.
             else:
                 improve_keys = jax.random.split(
                     improve_key, search_roots.state.shape[0]
                 )
-                policy_target, improve_adv = jax.vmap(
+                policy_target, improve_adv = jax.vmap(  # type: ignore
                     one_step_improve,
                     (None, 0, None, 0, None, None, None, None),
                 )(
@@ -204,7 +206,8 @@ class RosmoLearner(acme.core.Learner):
                     sampling,
                 )
                 uniform_policy = jnp.ones_like(policy_target) / num_actions
-                random_policy_mask = jnp.cumprod(1.0 - unroll_trajectory.is_last) == 0.0
+                random_policy_mask = jnp.cumprod(
+                    1.0 - unroll_trajectory.is_last) == 0.0
                 random_policy_mask = jnp.broadcast_to(
                     random_policy_mask[:, None], policy_target.shape
                 )
@@ -223,12 +226,13 @@ class RosmoLearner(acme.core.Learner):
                 v_bootstrap = target_roots.value
 
             def n_step_return(i: int) -> jnp.ndarray:
-                bootstrap_value = jax.tree_map(lambda t: t[i + td_steps], v_bootstrap)
+                bootstrap_value = jax.tree_map(
+                    lambda t: t[i + td_steps], v_bootstrap)
                 _rewards = jnp.concatenate(
-                    [rewards[i : i + td_steps], bootstrap_value[None]], axis=0
+                    [rewards[i: i + td_steps], bootstrap_value[None]], axis=0
                 )
                 _discounts = jnp.concatenate(
-                    [jnp.ones((1,)), jnp.cumprod(discounts[i : i + td_steps])],
+                    [jnp.ones((1,)), jnp.cumprod(discounts[i: i + td_steps])],
                     axis=0,
                 )
                 return jnp.sum(_rewards * _discounts)
@@ -238,16 +242,18 @@ class RosmoLearner(acme.core.Learner):
                 returns.append(n_step_return(i))
             returns = jnp.stack(returns)
             # Value targets for the absorbing state and the states after are 0.
-            zero_return_mask = jnp.cumprod(1.0 - unroll_trajectory.is_last) == 0.0
+            zero_return_mask = jnp.cumprod(
+                1.0 - unroll_trajectory.is_last) == 0.0
             value_target = jax.lax.select(
                 zero_return_mask, jnp.zeros_like(returns), returns
             )
             value_target_transformed = value_transform(value_target)
-            value_logits_target = scalar_to_two_hot(value_target_transformed, num_bins)
+            value_logits_target = scalar_to_two_hot(
+                value_target_transformed, num_bins)
             value_logits_target = jax.lax.stop_gradient(value_logits_target)
 
             # 3) Behavior regularization.
-            behavior_loss = 0.0
+            behavior_loss = jnp.array(0.)
             if not use_mcts:
                 in_sample_action = trajectory.action[: unroll_steps + 1]
                 log_prob = jax.nn.log_softmax(policy_logits)
@@ -256,17 +262,19 @@ class RosmoLearner(acme.core.Learner):
                 ]
 
                 _target_value = target_roots.value[: unroll_steps + 1]
-                _target_reward = target_roots.reward[1 : unroll_steps + 1 + 1]
-                _target_value_prime = target_roots.value[1 : unroll_steps + 1 + 1]
+                _target_reward = target_roots.reward[1: unroll_steps + 1 + 1]
+                _target_value_prime = target_roots.value[1: unroll_steps + 1 + 1]
                 _target_adv = (
                     _target_reward
                     + discount_factor * _target_value_prime
                     - _target_value
                 )
                 _target_adv = jax.lax.stop_gradient(_target_adv)
-                behavior_loss = -action_log_prob * jnp.heaviside(_target_adv, 0.0)
+                behavior_loss = -action_log_prob * \
+                    jnp.heaviside(_target_adv, 0.0)
                 # Deal with cross-episode trajectories.
-                invalid_action_mask = jnp.cumprod(1.0 - trajectory.is_first[1:]) == 0.0
+                invalid_action_mask = jnp.cumprod(
+                    1.0 - trajectory.is_first[1:]) == 0.0
                 behavior_loss = jax.lax.select(
                     invalid_action_mask[: unroll_steps + 1],
                     jnp.zeros_like(behavior_loss),
@@ -283,13 +291,15 @@ class RosmoLearner(acme.core.Learner):
 
             value_loss = (
                 jnp.mean(
-                    _batch_categorical_cross_entropy(value_logits_target, value_logits)
+                    _batch_categorical_cross_entropy(
+                        value_logits_target, value_logits)
                 )
                 * value_coef
             )
 
             policy_loss = (
-                jnp.mean(_batch_categorical_cross_entropy(policy_target, policy_logits))
+                jnp.mean(_batch_categorical_cross_entropy(
+                    policy_target, policy_logits))
                 * policy_coef
             )
 
@@ -297,12 +307,12 @@ class RosmoLearner(acme.core.Learner):
 
             if sampling:
                 # Unnormalized.
-                def entropy_fn(p):
+                def entropy_fn(p: Array) -> Array:
                     return distrax.Categorical(logits=p).entropy()
 
             else:
 
-                def entropy_fn(p):
+                def entropy_fn(p: Array) -> Array:
                     return distrax.Categorical(probs=p).entropy()
 
             policy_target_entropy = jax.vmap(entropy_fn)(policy_target)
@@ -442,7 +452,8 @@ class RosmoLearner(acme.core.Learner):
             mask=weight_decay_mask,
         )
         if max_grad_norm:
-            optimizer = optax.chain(optax.clip_by_global_norm(max_grad_norm), optimizer)
+            optimizer = optax.chain(
+                optax.clip_by_global_norm(max_grad_norm), optimizer)
         optimizer_state = optimizer.init(params)
         target_params = params
 
@@ -455,7 +466,8 @@ class RosmoLearner(acme.core.Learner):
         )
         self._target_update_interval = target_update_interval
 
-        self._state = jax.device_put_replicated(self._state, jax.local_devices())
+        self._state = jax.device_put_replicated(
+            self._state, jax.local_devices())
 
         # Do not record timestamps until after the first learning step is done.
         # This is to avoid including the time it takes for actors to come online
@@ -472,12 +484,14 @@ class RosmoLearner(acme.core.Learner):
         trajectory: ActorOutput = next(self._demonstrations)
         trajectory = tree.map_structure(
             lambda x: x.reshape(
-                self._num_devices, self._batch_size // self._num_devices, *x.shape[1:]
+                self._num_devices, self._batch_size // self._num_devices, *
+                x.shape[1:]
             ),
             trajectory,
         )
 
-        self._state, metrics = self._update_step(self._state, trajectory, update_keys)
+        self._state, metrics = self._update_step(
+            self._state, trajectory, update_keys)
 
         _step = self._state.step[0]  # type: ignore
         timestamp = time.time()
@@ -524,7 +538,8 @@ class RosmoLearner(acme.core.Learner):
         Returns:
             TrainingState: State to be saved.
         """
-        _state = utils.fetch_devicearray(jax.tree_map(lambda t: t[0], self._state))
+        _state = utils.fetch_devicearray(
+            jax.tree_map(lambda t: t[0], self._state))
         return _state
 
     def restore(self, state: TrainingState) -> None:
@@ -597,4 +612,3 @@ def model_unroll(
         value_logits=value_logits,
         value=value,
     )
-

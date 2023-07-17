@@ -87,7 +87,7 @@ class RosmoEvalActor(acme.core.Actor):
                 )
                 action = mcts_out.action
             else:
-                agent_out: AgentOutput = jax.tree_map(
+                agent_out = jax.tree_map(
                     lambda t: t.squeeze(axis=0), agent_out
                 )  # Squeeze the dummy time dimension.
                 if not sampling:

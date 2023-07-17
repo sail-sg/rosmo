@@ -31,7 +31,8 @@ from rosmo.type import Array
 
 with open(
     os.path.join(
-        os.path.dirname(os.path.abspath(__file__)), "rl_unplugged_atari_baselines.json"
+        os.path.dirname(os.path.abspath(__file__)
+                        ), "rl_unplugged_atari_baselines.json"
     ),
     "r",
 ) as f:
@@ -106,7 +107,8 @@ def _get_trajectory_dataset_fn(
             transitions = transitions.skip(
                 tf.random.uniform([], 0, trajectory_length, dtype=tf.int64)
             )
-            trajectory = transitions.batch(trajectory_length, drop_remainder=True)
+            trajectory = transitions.batch(
+                trajectory_length, drop_remainder=True)
         else:
             trajectory = transitions
         return trajectory
@@ -128,7 +130,8 @@ def _uniformly_subsampled_atari_data(
         num_episodes = int((data_percent / 100) * info.num_examples)
         total_num_episode += num_episodes
         if num_episodes == 0:
-            raise ValueError(f"{data_percent}% leads to 0 episodes in {split}!")
+            raise ValueError(
+                f"{data_percent}% leads to 0 episodes in {split}!")
         # Sample first `data_percent` episodes from each of the data split.
         data_splits.append(f"{split}[:{num_episodes}]")
     # Interleave episodes across different splits/checkpoints.
@@ -181,7 +184,8 @@ def create_atari_ds_loader(
         tf.data.Dataset: Dataset.
     """
     if trajectory_fn is None:
-        trajectory_fn = _get_trajectory_dataset_fn(stack_size, trajectory_length)
+        trajectory_fn = _get_trajectory_dataset_fn(
+            stack_size, trajectory_length)
     dataset_name = f"rlu_atari_checkpoints_ordered/{env_name}_run_{run_number}"
     # Create a dataset of episodes sampling `data_percent`% episodes
     # from each of the data split.
@@ -220,14 +224,14 @@ class _AtariDopamineWrapper(dm_env.Environment):
         self._episode_steps = 0
         self._reset_next_step = False
         observation = self._env.reset()
-        return dm_env.restart(observation.squeeze(-1))
+        return dm_env.restart(observation.squeeze(-1)) # type: ignore
 
     def step(self, action: Union[int, Array]) -> dm_env.TimeStep:
         if self._reset_next_step:
             return self.reset()
         if not isinstance(action, int):
             action = action.item()
-        observation, reward, terminal, _ = self._env.step(action)
+        observation, reward, terminal, _ = self._env.step(action) # type: ignore
         observation = observation.squeeze(-1)
         discount = 1 - float(terminal)
         self._episode_steps += 1
@@ -241,10 +245,10 @@ class _AtariDopamineWrapper(dm_env.Environment):
 
     def observation_spec(self) -> specs.Array:
         space = self._env.observation_space
-        return specs.Array(space.shape[:-1], space.dtype)
+        return specs.Array(space.shape[:-1], space.dtype) # type: ignore
 
     def action_spec(self) -> specs.DiscreteArray:
-        return specs.DiscreteArray(self._env.action_space.n)
+        return specs.DiscreteArray(self._env.action_space.n) # type: ignore
 
     def render(self, mode: str = "rgb_array") -> Any:
         """Render the environment.
@@ -260,7 +264,8 @@ class _AtariDopamineWrapper(dm_env.Environment):
 
 def environment(game: str, stack_size: int) -> dm_env.Environment:
     """Atari environment."""
-    env = atari_lib.create_atari_environment(game_name=game, sticky_actions=True)
+    env = atari_lib.create_atari_environment(
+        game_name=game, sticky_actions=True)
     env = _AtariDopamineWrapper(env, max_episode_steps=20_000)
     env = wrappers.FrameStackingWrapper(env, num_frames=stack_size)
     return wrappers.SinglePrecisionWrapper(env)
