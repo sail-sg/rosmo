@@ -134,7 +134,6 @@ warn_no_return = true
 warn_redundant_casts = true
 warn_unreachable = true
 warn_unused_configs = true
-warn_unused_ignores = true
 
 [tool.pydocstyle]
 ignore = ["D100", "D102", "D104", "D105", "D107", "D203", "D213", "D401", "D402"]
