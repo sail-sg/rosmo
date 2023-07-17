@@ -68,7 +68,7 @@ python experiment/atari/main.py -exp_id rosmo -env MsPacman -nodebug -use_wb -us
 ```console
 python experiment/atari/main.py -exp_id rosmo-sample-4 -sampling -env MsPacman -nodebug -use_wb -user ${WB_USER}
 ```
-1. Train MuZero unplugged for benchmark (N=20).
+3. Train MuZero unplugged for benchmark (N=20).
 ```console
 python experiment/atari/main.py -exp_id mzu-sample-20 -algo mzu -num_simulations 20 -env MsPacman -nodebug -use_wb -user ${WB_USER}
 ```
