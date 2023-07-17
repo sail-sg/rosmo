@@ -25,7 +25,8 @@ from absl import logging
 from acme import types
 from acme.jax import networks as networks_lib
 
-from rosmo.agent.learning import mcts_improve, one_step_improve, root_unroll
+from rosmo.agent.improvement import mcts_improve, one_step_improve
+from rosmo.agent.learning import root_unroll
 from rosmo.agent.network import Networks
 from rosmo.agent.type import AgentOutput, Params
 from rosmo.type import ActorOutput, Array

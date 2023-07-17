@@ -73,7 +73,7 @@ def get_learner(config, networks, data_iterator, logger) -> RosmoLearner:
     return learner
 
 
-# ===== Eval Actor-Env Loop. ===== #
+# ===== Eval Actor-Env Loop & Observer. ===== #
 def get_actor_env_eval_loop(
     config, networks, environment, observers, logger
 ) -> Tuple[RosmoEvalActor, EnvironmentLoop]:
@@ -100,7 +100,7 @@ def get_env_loop_observers() -> List[ExtendedEnvLoopObserver]:
     return observers
 
 
-# ===== Environment & Dataloader ===== #
+# ===== Environment & Dataloader. ===== #
 def get_env_data_loader(config) -> Tuple[dm_env.Environment, Iterator]:
     """Get environment and trajectory data loader."""
     trajectory_length = config["unroll_steps"] + config["td_steps"] + 1
@@ -136,7 +136,7 @@ def get_env_data_loader(config) -> Tuple[dm_env.Environment, Iterator]:
     return environment, iterator
 
 
-# ===== Network ===== #
+# ===== Network. ===== #
 def get_networks(config, environment) -> Networks:
     """Get environment-specific networks."""
     environment_spec = make_environment_spec(environment)
