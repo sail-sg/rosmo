@@ -37,6 +37,8 @@ jobs:
           python-version: 3.8.13
       - uses: ./.github/actions/cache
       - name: Install
-        run: pip install -e .
+        run: |
+          pip install -e .
+          pip install chex==0.1.5
       - name: Lint
         run: make checks

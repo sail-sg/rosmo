@@ -16,6 +16,7 @@
 2. Clone this repository and install it in develop mode:
 ```console
 pip install -e .
+pip install chex==0.1.5
 ```
 3. [Install the ROM for Atari](https://github.com/openai/atari-py#roms).
 4. Download dataset:
