@@ -56,4 +56,4 @@ pip install --upgrade "jax[cuda]==0.3.25" -f https://storage.googleapis.com/jax-
 
 ### Test
 
-Finally, for TPU/GPU users, to validate you have installed correctly, run `python -c "import jax; print(jax.devices())"` and expect a list of TPU/GPU devices printed.
+Finally, for TPU/GPU users, to validate you have installed Jax correctly, run `python -c "import jax; print(jax.devices())"` and expect a list of TPU/GPU devices printed.
