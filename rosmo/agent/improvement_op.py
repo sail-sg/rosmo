@@ -92,7 +92,8 @@ def one_step_improve(
             f"[Sample] Using {num_simulations} samples to estimate improvement."
         )
         pi_sample = distrax.Categorical(probs=pi_prior)
-        sample_acts = pi_sample.sample(seed=rng_key, sample_shape=num_simulations)
+        sample_acts = pi_sample.sample(
+            seed=rng_key, sample_shape=num_simulations)
         sample_one_step_out: AgentOutput = model_simulate(
             networks, params, num_bins, model_root.state, sample_acts
         )
@@ -110,7 +111,8 @@ def one_step_improve(
             """Body fun for the loop."""
             normalizer_i = normalizer_raw - sample_exp_adv[i] / num_simulations
             delta = jnp.zeros_like(val)
-            delta = delta.at[sample_acts[i]].set(sample_exp_adv[i] / normalizer_i)
+            delta = delta.at[sample_acts[i]].set(
+                sample_exp_adv[i] / normalizer_i)
             return val + delta
 
         coeff = jax.lax.fori_loop(0, num_simulations, body, coeff)
@@ -152,8 +154,6 @@ def mcts_improve(
     search_depth: int,
 ) -> mctx.PolicyOutput:
     """Obtain the Monte-Carlo Tree Search target policy."""
-
-    # Batch size of [T].
 
     def recurrent_fn(
         params: Params, rng_key: networks_lib.PRNGKey, action: Array, state: Array
